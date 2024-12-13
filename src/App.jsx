@@ -1,17 +1,20 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+// src/App.js
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { FolderProvider } from "./context/FolderContext";
+import FolderList from "./pages/ViewListFolder/ViewListFolder.jsx";
+import EditQuyHoach from "./pages/EditQuyHoach/EditQuyHoach.jsx";
 
-import EditQuyHoach from "./pages/EditQuyHoach/EditQuyHoach";
-import ViewListFolder from "./pages/ViewListFolder/ViewListFolder";
-const App = () => {
+function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<EditQuyHoach />} />
-        <Route path="/listfolders" element={<ViewListFolder />} />
-      </Routes>
-    </Router>
+    <FolderProvider>
+      <Router>
+        <Routes>
+          <Route path="/listfolders" element={<FolderList />} />
+          <Route path="/" element={<EditQuyHoach />} />
+        </Routes>
+      </Router>
+    </FolderProvider>
   );
-};
+}
 
 export default App;

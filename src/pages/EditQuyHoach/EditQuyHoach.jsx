@@ -7,6 +7,7 @@ import {
   handleDelete,
 } from "./functions/EditQuyHoachHelper";
 import { getColumns } from "./columns";
+import { Link } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -70,7 +71,6 @@ function EditQuyHoach() {
     handleSelectAllChange,
   });
 
-
   const removeVietnameseTones = (str) => {
     return str
       .normalize("NFD") // Chuẩn hóa chuỗi để tách các ký tự đặc biệt
@@ -93,8 +93,6 @@ function EditQuyHoach() {
     }
   };
 
-
-
   return (
     <div className="container">
       <h2>SỬA - XÓA QUY HOẠCH</h2>
@@ -111,7 +109,9 @@ function EditQuyHoach() {
         dataSource={filteredData}
         columns={columns}
         pagination={{ pageSize: 5 }}
-        rowClassName={(record) => (checkedRows[record.key] ? "checked-row" : "")}
+        rowClassName={(record) =>
+          checkedRows[record.key] ? "checked-row" : ""
+        }
         style={{ minHeight: "400px" }}
         className="custom-table"
       />
@@ -124,7 +124,9 @@ function EditQuyHoach() {
           <Select className="select-small" placeholder="Mã tỉnh">
             <Option value="28">28</Option>
           </Select>
-          <Button type="primary" className="button-green">Chọn thư mục</Button>
+          <Button type="primary" className="button-green">
+            <Link to={"/listfolders"}>Chọn thư mục</Link>
+          </Button>
         </div>
 
         <div className="layout-row-2">
@@ -135,22 +137,40 @@ function EditQuyHoach() {
             <Option value="Quy hoạch xây dựng">Quy hoạch xây dựng</Option>
           </Select>
           <div className="button-group">
-            <Button type="primary" danger className="button-red"
-              onClick={() => handleDelete(filteredData, checkedRows, setFilteredData, setCheckedRows, setSelectAllChecked)}
-            >Xóa</Button>
-            <Button type="primary" className="button-green">Sửa</Button>
+            <Button
+              type="primary"
+              danger
+              className="button-red"
+              onClick={() =>
+                handleDelete(
+                  filteredData,
+                  checkedRows,
+                  setFilteredData,
+                  setCheckedRows,
+                  setSelectAllChecked
+                )
+              }
+            >
+              Xóa
+            </Button>
+            <Button type="primary" className="button-green">
+              Sửa
+            </Button>
           </div>
-
         </div>
 
         <div className="layout-row-3">
           <Input className="input-large" placeholder="Nhập tọa độ..." />
-          <Button type="primary" className="button-green">Tìm trên bản đồ</Button>
-          <Input className="input-path" defaultValue="D:\\QuyHoach\\HaNoi\\HoangMai" />
+          <Button type="primary" className="button-green">
+            Tìm trên bản đồ
+          </Button>
+          <Input
+            className="input-path"
+            defaultValue="D:\\QuyHoach\\HaNoi\\HoangMai"
+          />
         </div>
         <span className="note">* Chỉ quy hoạch 1:500 dự án.</span>
       </div>
-
     </div>
   );
 }

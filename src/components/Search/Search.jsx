@@ -13,7 +13,6 @@ const Search = ({ searchTerm, setSearchTerm }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
         />
-        <FaSearch className="search-icon" />
       </div>
     </div>
   );
