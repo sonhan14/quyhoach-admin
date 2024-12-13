@@ -1,5 +1,4 @@
 // columns.js
-import React from "react";
 import { Checkbox, Input, Select } from "antd";
 import {
     handleCheckboxChange,

@@ -2,6 +2,9 @@
 
 .folder-list-container {
   padding: 20px;
+  background-color: #1e1e1e; /* Thêm màu nền tối cho toàn bộ container */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Tạo hiệu ứng bóng đổ nhẹ */
 }
 
 .folder-items-container {
@@ -9,36 +12,64 @@
   flex-wrap: wrap; /* Đảm bảo các item không bị tràn ra ngoài mà sẽ xuống hàng khi hết chỗ */
   gap: 20px;
   justify-content: center;
+  margin-top: 20px; /* Thêm khoảng cách trên để tránh dính vào đầu container */
 }
 
 .folder-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
-  width: 150px; /* Giữ width của mỗi item */
-  height: 180px; /* Thêm chiều cao cho mỗi item */
-  border-radius: 8px;
+  padding: 15px;
+  width: 160px; /* Đặt rộng hơn để các icon và văn bản thoải mái hơn */
+  height: 200px; /* Tăng chiều cao để vừa với icon và văn bản */
+  border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Thêm hiệu ứng chuyển động */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ cho các mục */
 }
 
 .folder-item:hover {
-  transform: scale(1.05);
+  transform: scale(1.05); /* Hiệu ứng phóng to khi hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Tăng độ bóng đổ khi hover */
 }
 
 .folder-icon {
-  width: 80px; /* Đặt chiều rộng của icon */
-  height: 80px; /* Đặt chiều cao của icon */
+  width: 90px; /* Đặt chiều rộng của icon */
+  height: 90px; /* Đặt chiều cao của icon */
   margin-bottom: 10px;
+  object-fit: contain; /* Đảm bảo icon không bị mờ hoặc méo */
 }
 
 .folder-text {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 14px; /* Tăng kích thước font */
+  font-weight: 500; /* Chỉnh lại độ đậm của font */
   text-align: center;
   color: #ffffff;
-  width: 80px; /* Đặt chiều rộng cho text */
-  height: 28px; /* Đặt chiều cao cho text */
-  font-family: ;
+  width: 100%; /* Giãn rộng text ra đầy chiều rộng của item */
+  height: auto; /* Thay vì cố định chiều cao */
+  font-family: "Arial", sans-serif; /* Thêm font gia đình cho văn bản */
+  line-height: 1.4; /* Điều chỉnh line height cho dễ đọc */
+  padding-top: 5px; /* Thêm khoảng cách trên văn bản */
+}
+
+.type-selector {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.type-selector button {
+  background-color: #3a3a3a;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.type-selector button:hover {
+  background-color: #666666; /* Thay đổi màu nền khi hover */
 }
