@@ -24,6 +24,8 @@ export const getColumns = ({
     selectAllChecked,
     setSelectAllChecked,
     handleSelectAllChange,
+    selectedRecord,
+    setSelectedRecord
 }) => {
     const renderEditableCell = (text, record, field) => {
         const isEditing = record.key === editingKey && editingField === field;
@@ -33,13 +35,14 @@ export const getColumns = ({
         const expiryYears = ["2027", "2028", "2030"];
         const types = ["Quy hoạch quận/huyện", "Quy hoạch 1:500 dự án"];
 
-        if (["provinceCode", "districtCode", "expiryYear", "type"].includes(field)) {
+        if (["idProvince", "idDistrict", "nam_het_han", "type"].includes(field)) {
             return isEditing ? (
                 <Select
                     value={editingText}
                     onChange={(value) => setEditingText(value)}
                     onBlur={() =>
                         handleSave(
+                            selectedRecord,
                             editingKey,
                             filteredData,
                             editingField,
@@ -52,9 +55,9 @@ export const getColumns = ({
                     }
                     autoFocus
                 >
-                    {(field === "provinceCode"
+                    {(field === "idProvince"
                         ? provinces
-                        : field === "districtCode"
+                        : field === "idDistrict"
                             ? districts
                             : field === "type"
                                 ? types
@@ -69,12 +72,14 @@ export const getColumns = ({
                 <div
                     onDoubleClick={() =>
                         handleEdit(
+                            record,
                             record.key,
                             field,
                             text,
                             setEditingKey,
                             setEditingField,
-                            setEditingText
+                            setEditingText,
+                            setSelectedRecord
                         )
                     }
                 >
@@ -124,6 +129,7 @@ export const getColumns = ({
                 onChange={(e) => setEditingText(e.target.value)}
                 onPressEnter={() =>
                     handleSave(
+                        selectedRecord,
                         editingKey,
                         filteredData,
                         editingField,
@@ -136,6 +142,7 @@ export const getColumns = ({
                 }
                 onBlur={() =>
                     handleSave(
+                        selectedRecord,
                         editingKey,
                         filteredData,
                         editingField,
@@ -152,12 +159,14 @@ export const getColumns = ({
             <div
                 onDoubleClick={() =>
                     handleEdit(
+                        record,
                         record.key,
                         field,
                         text,
                         setEditingKey,
                         setEditingField,
-                        setEditingText
+                        setEditingText,
+                        setSelectedRecord
                     )
                 }
             >
@@ -176,31 +185,31 @@ export const getColumns = ({
         },
         {
             title: "Tên quy hoạch",
-            dataIndex: "name",
-            key: "name",
+            dataIndex: "description",
+            key: "description",
             width: 320,
-            render: (text, record) => renderEditableCell(text, record, "name"),
+            render: (text, record) => renderEditableCell(text, record, "description"),
         },
         {
             title: "Mã quận/huyện",
-            dataIndex: "districtCode",
-            key: "districtCode",
+            dataIndex: "idDistrict",
+            key: "idDistrict",
             width: 120,
-            render: (text, record) => renderEditableCell(text, record, "districtCode"),
+            render: (text, record) => renderEditableCell(text, record, "idDistrict"),
         },
         {
             title: "Năm hết hạn",
-            dataIndex: "expiryYear",
-            key: "expiryYear",
+            dataIndex: "nam_het_han",
+            key: "nam_het_han",
             width: 120,
-            render: (text, record) => renderEditableCell(text, record, "expiryYear"),
+            render: (text, record) => renderEditableCell(text, record, "nam_het_han"),
         },
         {
             title: "Mã tỉnh",
-            dataIndex: "provinceCode",
-            key: "provinceCode",
+            dataIndex: "idProvince",
+            key: "idProvince",
             width: 100,
-            render: (text, record) => renderEditableCell(text, record, "provinceCode"),
+            render: (text, record) => renderEditableCell(text, record, "idProvince"),
         },
         {
             title: "Loại quy hoạch",
@@ -211,18 +220,18 @@ export const getColumns = ({
         },
         {
             title: "Tọa độ (nếu có)",
-            dataIndex: "coordinates",
-            key: "coordinates",
-            width: 200,
+            dataIndex: "location",
+            key: "location",
+            width: 300,
             render: (text, record) =>
-                renderEditableCell(text, record, "coordinates"),
+                renderEditableCell(text, record, "location"),
         },
         {
             title: "Đường dẫn",
-            dataIndex: "path",
-            key: "path",
+            dataIndex: "huyen_image",
+            key: "huyen_image",
             width: 350,
-            render: (text, record) => renderEditableCell(text, record, "path"),
+            render: (text, record) => renderEditableCell(text, record, "huyen_image"),
         },
         {
             title: (

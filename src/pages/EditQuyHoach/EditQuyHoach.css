@@ -26,6 +26,7 @@ h2 {
     /* Xóa màu nền khi hover */
 }
 
+
 .custom-table .ant-table-thead>tr>th {
     background-color: rgba(102, 220, 106, 1);
     color: white;

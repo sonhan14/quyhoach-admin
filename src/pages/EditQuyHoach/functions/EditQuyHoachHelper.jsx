@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export const handleCheckboxChange = (record, checked, setCheckedRows) => {
     if (checked) {
         setCheckedRows((prevCheckedRows) => ({ ...prevCheckedRows, [record.key]: true }));
@@ -24,10 +26,13 @@ export const handleSelectAllChange = (e, dataSource, setCheckedRows, setSelectAl
     }
 };
 
-export const handleEdit = (key, field, currentText, setEditingKey, setEditingField, setEditingText) => {
+export const handleEdit = (record, key, field, currentText, setEditingKey, setEditingField, setEditingText, setSelectedRecord) => {
     setEditingKey(key);
     setEditingField(field);
     setEditingText(currentText);
+    setSelectedRecord(record)
+    console.log(record);
+
 };
 
 export const handlePathDoubleClick = (record, setEditingKey, setEditingField, setEditingText) => {
@@ -37,7 +42,8 @@ export const handlePathDoubleClick = (record, setEditingKey, setEditingField, se
 };
 
 
-export const handleSave = (
+export const handleSave = async (
+    selectedRecord,
     editingKey,
     filteredData,
     editingField,
@@ -49,15 +55,51 @@ export const handleSave = (
 ) => {
     if (!editingKey) return;
 
-    const updatedData = filteredData.map((item) =>
-        item.key === editingKey ? { ...item, [editingField]: editingText } : item
-    );
+    // if (selectedRecord.type === "QUAN_HUYEN") {
+    //     try {
+    //         // Making API call to update the data
+    //         const formData = new FormData();
+    //         formData.append('description', editingText); // Add description field with the editingText value
 
-    setFilteredData(updatedData);
-    setEditingKey(null);
-    setEditingField(null);
-    setEditingText("");
+    //         // Making the API call with form-data
+    //         const response = await axios.post(
+    //             `https://api.quyhoach.xyz/edit_quyhoach_type/quanhuyen/${selectedRecord.key}`,
+    //             formData,
+    //             {
+    //                 headers: {
+    //                     'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+    //                 },
+    //             }
+    //         );
+
+    //         console.log(response);
+
+    //         // Handling different response status codes
+    //         if (response.status === 200) {
+    //             const updatedData = filteredData.map((item) =>
+    //                 item.key === editingKey ? { ...item, [editingField]: editingText } : item
+    //             );
+
+    //             setFilteredData(updatedData);
+    //             setEditingKey(null);
+    //             setEditingField(null);
+    //             setEditingText("");
+    //         } else if (response.status === 205) {
+    //             // Reset UI or form if 205 is received
+    //             setEditingKey(null);
+    //             setEditingField(null);
+    //             setEditingText("");
+    //             console.log(response.data);
+    //         } else {
+    //             console.error('API update failed:', response);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error updating data:', error);
+    //     }
+    // }
+
 };
+
 
 export const handleDelete = (filteredData, checkedRows, setFilteredData, setCheckedRows, setSelectAllChecked) => {
     const remainingRows = filteredData.filter(
