@@ -1,0 +1,44 @@
+/* src/components/Search.css */
+.search-container {
+  background-color: #262d34;
+  padding: 10px;
+  justify-content: center;
+  display: flex;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.search-input-wrapper {
+  padding: 10px;
+  text-align: center;
+  width: 467px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-input {
+  padding: 15px 40px 15px 15px; /* Padding để tạo không gian cho icon */
+  width: 100%;
+  border-radius: 30px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+}
+
+.search-input:focus {
+  border: 1px solid #fff; /* Viền trắng khi focus */
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ccc;
+  font-size: 20px;
+  cursor: pointer;
+}

@@ -1,0 +1,224 @@
+/* General layout styles */
+body {
+    background-color: #131313;
+    font-family: Arial, sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+.container {
+    padding: 10px;
+    background-color: rgba(38, 45, 52, 1);
+    width: calc(100% - 40px);
+    margin-left: 10px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 24px;
+}
+
+.ant-table-tbody>tr:hover>td {
+    background-color: transparent !important;
+    /* Xóa màu nền khi hover */
+}
+
+.custom-table .ant-table-thead>tr>th {
+    background-color: rgba(102, 220, 106, 1);
+    color: white;
+    text-align: center;
+
+}
+
+.checked-row {
+    background-color: red;
+}
+
+/* .form-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+    margin-top: 10px;
+} */
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: calc(100% - 40px);
+}
+
+.row {
+    display: grid;
+    gap: 15px;
+}
+
+.row-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.row-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.row .ant-form-item {
+    margin-bottom: 0;
+}
+
+.form-container input,
+.form-container select {
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: white;
+    color: black;
+    font-size: 14px;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+    border-color: #1f8a1f;
+    box-shadow: 0 0 0 2px rgba(31, 138, 31, 0.2);
+}
+
+.form-container button {
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-container .btn-green {
+    background-color: #1f8a1f;
+    color: white;
+}
+
+.form-container .btn-green:hover {
+    background-color: #28a745;
+}
+
+.form-container .btn-red {
+    background-color: #ff4d4f;
+    color: white;
+}
+
+.form-container .btn-red:hover {
+    background-color: #ff7875;
+}
+
+.form-container label {
+    color: white;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+
+.note {
+    font-size: 12px;
+    color: #ff4d4f;
+    margin-top: 10px;
+}
+
+
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    color: white;
+    font-family: 'Arial', sans-serif;
+}
+
+.layout-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.layout-row-1 {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.layout-row-2 {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.layout-row-3 {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.input-large {
+    width: 450px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.input-medium {
+    width: 200px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.input-path {
+    width: 450px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.select-small {
+    width: 200px;
+    height: 40px;
+}
+
+.select-medium {
+    width: 450px;
+    height: 40px;
+}
+
+.button-green {
+    background-color: #52c41a;
+    border-color: #52c41a;
+    height: 40px;
+    padding: 0 16px;
+}
+
+.button-green:hover {
+    background-color: #73d13d;
+    border-color: #73d13d;
+}
+
+.button-red {
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+    height: 40px;
+    padding: 0 16px;
+}
+
+.button-red:hover {
+    background-color: #ff7875;
+    border-color: #ff7875;
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+
+}
+
+.note {
+    color: #ff4d4f;
+    font-size: 14px;
+}
