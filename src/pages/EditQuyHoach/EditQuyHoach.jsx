@@ -8,10 +8,13 @@ import {
   handleDelete,
 } from "./functions/EditQuyHoachHelper";
 import { getColumns } from "./columns";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const { Option } = Select;
 
 function EditQuyHoach() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [dataSource, setDataSource] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [editingKey, setEditingKey] = useState(null);
@@ -25,46 +28,57 @@ function EditQuyHoach() {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedProvince, setSelectedProvince] = useState("");
 
+
   const [formData, setFormData] = useState({
-    description: "",
-    idDistrict: "",
+    description: "abc",
+    idDistrict: "14",
     idProvince: "28", // default value
     nam_het_han: "2021", // default value
     type: "Quy hoạch xây dựng", // default value
     location: "",
-    huyen_image: "D:\\QuyHoach\\HaNoi\\HoangMai",
+    huyen_image: "",
     zoom: 18 // default value
   });
 
+  useEffect(() => {
+    if (location.state && location.state.path) {
+      setFormData((prevData) => ({
+        ...prevData,
+        huyen_image: location.state.path, // Gán giá trị vào huyen_image
+      }));
+    }
+  }, [location.state]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        "https://api.quyhoach.xyz/allquyhoach_type/quanhuyen?fbclid=IwY2xjawHIix5leHRuA2FlbQIxMAABHRzNtOl88ZQyi_VcvJhJvXo-up4Tj0FDkt48_dmcyG6GUzlr-iAmJC1r5A_aem_I5_TCC5Std2uDekYaUNR1Q"
+      );
+      const data = response.data;
+
+      // Chuyển đổi dữ liệu từ API sang định dạng phù hợp cho bảng
+      const formattedData = data.Posts.map((item, index) => ({
+        key: item.id,
+        stt: index + 1,
+        description: item.description || "N/A",
+        idDistrict: item.idDistrict || "N/A",
+        nam_het_han: item.nam_het_han || "N/A",
+        idProvince: item.idProvince || "N/A",
+        type: item.type || "N/A",
+        coordinates: item.coordinates || "",
+        huyen_image: item.huyen_image || "N/A",
+        location: item.location || "N/A",
+      }));
+
+      setDataSource(formattedData);
+      setFilteredData(formattedData); // Khởi tạo dữ liệu lọc
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
   // Fetch data from API
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://api.quyhoach.xyz/allquyhoach_type/quanhuyen?fbclid=IwY2xjawHIix5leHRuA2FlbQIxMAABHRzNtOl88ZQyi_VcvJhJvXo-up4Tj0FDkt48_dmcyG6GUzlr-iAmJC1r5A_aem_I5_TCC5Std2uDekYaUNR1Q"
-        );
-        const data = response.data;
 
-        // Chuyển đổi dữ liệu từ API sang định dạng phù hợp cho bảng
-        const formattedData = data.Posts.map((item, index) => ({
-          key: item.id,
-          stt: index + 1,
-          description: item.description || "N/A",
-          idDistrict: item.idDistrict || "N/A",
-          nam_het_han: item.nam_het_han || "N/A",
-          idProvince: item.idProvince || "N/A",
-          type: item.type || "N/A",
-          coordinates: item.coordinates || "",
-          huyen_image: item.huyen_image || "N/A",
-          location: item.location || "N/A",
-        }));
-
-        setDataSource(formattedData);
-        setFilteredData(formattedData); // Khởi tạo dữ liệu lọc
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
 
     fetchData();
   }, []);
@@ -171,7 +185,7 @@ function EditQuyHoach() {
       insertData.append("zoom", updatedFormData.zoom);
       insertData.append("location", updatedFormData.location);
 
-      const response = await axios.post(
+      await axios.post(
         `https://api.quyhoach.xyz/insert_quyhoach_quanhuyen`,
         insertData,
         {
@@ -181,12 +195,16 @@ function EditQuyHoach() {
         }
       );
 
-      console.log(response.data);
       message.success("Dữ liệu đã được lưu!");
+      fetchData();
     } catch (error) {
       console.error("Error updating data:", error);
       message.error("Có lỗi xảy ra khi lưu dữ liệu!");
     }
+  };
+
+  const handleSelectFolder = () => {
+    navigate('/listfolders'); // Chuyển hướng đến màn /listfolders
   };
 
   return (
@@ -235,7 +253,7 @@ function EditQuyHoach() {
             value={selectedProvince}
             onChange={(value) => setSelectedProvince(value)}
             disabled
-            style={{ backgroundColor: 'white', borderRadius: 6 }}
+            style={{ backgroundColor: 'white', borderRadius: 6, color: 'black' }}
           >
             {selectedProvince && (
               <Option key={selectedProvince} value={selectedProvince}>
@@ -244,7 +262,9 @@ function EditQuyHoach() {
             )}
           </Select>
 
-          <Button type="primary" className="button-green">Chọn thư mục</Button>
+          <Button type="primary"
+            onClick={handleSelectFolder}
+            className="button-green">Chọn thư mục</Button>
         </div>
 
         <div className="layout-row-2">
@@ -300,8 +320,9 @@ function EditQuyHoach() {
           <Button type="primary" className="button-green">Tìm trên bản đồ</Button>
           <Input
             className="input-path"
-            defaultValue="D:\\QuyHoach\\HaNoi\\HoangMai"
-            onChange={(e) => handleChange("huyen_image", e.target.value)}
+            disabled
+            value={formData.huyen_image}
+            style={{ backgroundColor: 'white', color: 'black' }}
           />
         </div>
         <span className="note">* Chỉ quy hoạch 1:500 dự án.</span>

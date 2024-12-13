@@ -32,9 +32,62 @@ export const getColumns = ({
         const provinces = ["28", "30", "31"];
         const districts = ["01", "02", "03"];
         const expiryYears = ["2027", "2028", "2030"];
-        const types = ["Quy hoạch quận/huyện", "Quy hoạch 1:500 dự án"];
+        const types = ["Quy hoạch xây dựng", "Bản đồ địa chính", "Kế hoạch sử dụng đất 2024", "Quy hoạch 2030", " Quy hoạch tỉnh 2030"];
 
-        if (["idProvince", "idDistrict", "nam_het_han", "type"].includes(field)) {
+        if (["type"].includes(field)) {
+            return isEditing ? (
+                <Select
+                    value={editingText}
+                    onChange={(value) => setEditingText(value)}
+                    style={{ width: 250 }}
+                    onBlur={() =>
+                        handleSave(
+                            selectedRecord,
+                            editingKey,
+                            filteredData,
+                            editingField,
+                            editingText,
+                            setFilteredData,
+                            setEditingKey,
+                            setEditingField,
+                            setEditingText
+                        )
+                    }
+                    autoFocus
+                >
+                    {(field === "idProvince"
+                        ? provinces
+                        : field === "idDistrict"
+                            ? districts
+                            : field === "type"
+                                ? types
+                                : expiryYears
+                    ).map((item) => (
+                        <Option key={item} value={item}>
+                            {item}
+                        </Option>
+                    ))}
+                </Select>
+            ) : (
+                <div
+                    onDoubleClick={() =>
+                        handleEdit(
+                            record,
+                            record.key,
+                            field,
+                            text,
+                            setEditingKey,
+                            setEditingField,
+                            setEditingText,
+                            setSelectedRecord
+                        )
+                    }
+                >
+                    {text}
+                </div>
+            );
+        }
+        if (["idProvince", "idDistrict", "nam_het_han",].includes(field)) {
             return isEditing ? (
                 <Select
                     value={editingText}
@@ -207,14 +260,14 @@ export const getColumns = ({
             title: "Mã tỉnh",
             dataIndex: "idProvince",
             key: "idProvince",
-            width: 100,
+            width: 80,
             render: (text, record) => renderEditableCell(text, record, "idProvince"),
         },
         {
             title: "Loại quy hoạch",
             dataIndex: "type",
             key: "type",
-            width: 200,
+            width: 300,
             render: (text, record) => renderEditableCell(text, record, "type"),
         },
         {

@@ -3,6 +3,7 @@ import axios from "axios";
 import imgFolder from "../../assets/folder.png";
 import Search from "../../components/Search/Search.jsx";
 import "./ViewListFolder.css";
+import { useNavigate } from "react-router-dom";
 
 const FolderList = () => {
   const [data, setData] = useState({
@@ -15,6 +16,7 @@ const FolderList = () => {
   const [selectedType, setSelectedType] = useState("");
   const [searchTerm, setSearchTerm] = useState(""); // Thêm state tìm kiếm
   const [filteredData, setFilteredData] = useState([]); // Thêm state để lưu dữ liệu đã lọc
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,6 +81,7 @@ const FolderList = () => {
   };
 
   const renderContent = (data) => {
+
     if (loading) {
       return <p>Đang tải dữ liệu...</p>;
     }
@@ -96,14 +99,15 @@ const FolderList = () => {
 
       if (selectedType === "quyhoach_tinh") {
         const province = parts[5]; // Tỉnh (theo đường dẫn của bạn)
-        const district = parts[6]; // Quận, huyện
+        const district = parts[6];
 
         return (
           <div
             key={index}
-            onClick={() =>
-              console.log(`Đường dẫn API: ${item}, Loại: quyhoach_tinh`)
-            }
+            onClick={() => {
+              // console.log(`Đường dẫn API: ${item}, Loại: quyhoach_tinh`)
+              navigate('/editquyhoach');
+            }}
             className="folder-item"
           >
             <img src={imgFolder} alt="Folder Icon" className="folder-icon" />
@@ -119,9 +123,9 @@ const FolderList = () => {
         return (
           <div
             key={index}
-            onClick={() =>
-              console.log(`Đường dẫn API: ${item}, Loại: ${selectedType}`)
-            }
+            onClick={() => {
+              navigate('/editquyhoach', { state: { path: item } })
+            }}
             className="folder-item"
           >
             <img src={imgFolder} alt="Folder Icon" className="folder-icon" />
