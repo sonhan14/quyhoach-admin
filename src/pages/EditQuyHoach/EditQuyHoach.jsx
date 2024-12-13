@@ -9,6 +9,7 @@ import {
 } from "./functions/EditQuyHoachHelper";
 import { getColumns } from "./columns";
 import { useNavigate, useLocation } from "react-router-dom";
+import MapModal from './Modals/MapModal';
 
 const { Option } = Select;
 
@@ -27,6 +28,7 @@ function EditQuyHoach() {
   const [districtData, setDistrictData] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedProvince, setSelectedProvince] = useState("");
+  const [isMapModalVisible, setIsMapModalVisible] = useState(false);
 
 
   const [formData, setFormData] = useState({
@@ -39,6 +41,11 @@ function EditQuyHoach() {
     huyen_image: "",
     zoom: 18 // default value
   });
+
+  useEffect(() => {
+    console.log(formData);
+
+  }, [formData]);
 
   useEffect(() => {
     if (location.state && location.state.path) {
@@ -129,7 +136,8 @@ function EditQuyHoach() {
     setSelectAllChecked,
     handleSelectAllChange,
     selectedRecord,
-    setSelectedRecord
+    setSelectedRecord,
+    districtData
   });
 
   const removeVietnameseTones = (str) => {
@@ -207,6 +215,10 @@ function EditQuyHoach() {
     navigate('/listfolders'); // Chuyển hướng đến màn /listfolders
   };
 
+  const openModal = () => {
+    setIsMapModalVisible(true);
+  };
+
   return (
     <div className="container">
       <h2>SỬA - XÓA QUY HOẠCH</h2>
@@ -232,6 +244,7 @@ function EditQuyHoach() {
           <Input
             onChange={(e) => handleChange("description", e.target.value)}
             className="input-large"
+            value={formData.description}
             placeholder="Tên quy hoạch" />
 
           <Select
@@ -239,6 +252,7 @@ function EditQuyHoach() {
             className="select-small"
             placeholder="Mã quận/huyện"
             value={selectedDistrict}
+
           >
             {districtData.map((item) => (
               <Option key={item.DistrictID} value={item.DistrictID}>
@@ -251,6 +265,7 @@ function EditQuyHoach() {
             className="select-small"
             placeholder="Mã tỉnh"
             value={selectedProvince}
+
             onChange={(value) => setSelectedProvince(value)}
             disabled
             style={{ backgroundColor: 'white', borderRadius: 6, color: 'black' }}
@@ -272,17 +287,20 @@ function EditQuyHoach() {
           <Select
             onChange={(value) => handleChange("nam_het_han", value)}
             className="select-medium"
-            defaultValue="2024">
-            <Option value="202">2024</Option>
+            defaultValue={formData.nam_het_han}
+          >
+            <Option value="2024">2024</Option>
             <Option value="2025">2025</Option>
             <Option value="2030">2030</Option>
           </Select>
 
           <Select
-
             onChange={(value) => handleChange("type", value)}
             className="select-medium"
-            defaultValue="Quy hoạch xây dựng">
+            defaultValue={formData.type}
+
+          >
+
             <Option value="Quy hoạch xây dựng">Quy hoạch xây dựng</Option>
             <Option value="Bản đồ địa chính">Bản đồ địa chính</Option>
             <Option value="Kế hoạch sử dụng đất 2024">Kế hoạch sử dụng đất 2024</Option>
@@ -317,7 +335,9 @@ function EditQuyHoach() {
             onChange={(e) => handleChange("location", e.target.value)}
             className="input-large"
             placeholder="Nhập tọa độ..." />
-          <Button type="primary" className="button-green">Tìm trên bản đồ</Button>
+          <Button
+            onClick={openModal}
+            type="primary" className="button-green">Tìm trên bản đồ</Button>
           <Input
             className="input-path"
             disabled
@@ -327,6 +347,14 @@ function EditQuyHoach() {
         </div>
         <span className="note">* Chỉ quy hoạch 1:500 dự án.</span>
       </div>
+      <MapModal
+        isVisible={isMapModalVisible}
+        setIsMapModalVisible={setIsMapModalVisible}
+        setFormData={setFormData}
+        setSelectedDistrict={setSelectedDistrict}
+        setSelectedProvince={setSelectedProvince}
+      />
+
     </div>
   );
 }

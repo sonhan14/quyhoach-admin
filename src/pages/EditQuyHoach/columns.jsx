@@ -24,22 +24,22 @@ export const getColumns = ({
     setSelectAllChecked,
     handleSelectAllChange,
     selectedRecord,
-    setSelectedRecord
+    setSelectedRecord,
+    districtData,
 }) => {
     const renderEditableCell = (text, record, field) => {
         const isEditing = record.key === editingKey && editingField === field;
 
-        const provinces = ["28", "30", "31"];
-        const districts = ["01", "02", "03"];
-        const expiryYears = ["2027", "2028", "2030"];
+
+        const expiryYears = ["2024", "2025", "2030"];
         const types = ["Quy hoạch xây dựng", "Bản đồ địa chính", "Kế hoạch sử dụng đất 2024", "Quy hoạch 2030", " Quy hoạch tỉnh 2030"];
 
-        if (["type"].includes(field)) {
+        if (field === "idDistrict") {
             return isEditing ? (
                 <Select
-                    value={editingText}
+                    style={{ width: 100 }}
+                    value={editingText} // Gán giá trị mã quận
                     onChange={(value) => setEditingText(value)}
-                    style={{ width: 250 }}
                     onBlur={() =>
                         handleSave(
                             selectedRecord,
@@ -55,16 +55,9 @@ export const getColumns = ({
                     }
                     autoFocus
                 >
-                    {(field === "idProvince"
-                        ? provinces
-                        : field === "idDistrict"
-                            ? districts
-                            : field === "type"
-                                ? types
-                                : expiryYears
-                    ).map((item) => (
-                        <Option key={item} value={item}>
-                            {item}
+                    {districtData.map((item) => (
+                        <Option key={item.DistrictID} value={item.DistrictID}>
+                            {item.DistrictID}
                         </Option>
                     ))}
                 </Select>
@@ -87,7 +80,54 @@ export const getColumns = ({
                 </div>
             );
         }
-        if (["idProvince", "idDistrict", "nam_het_han",].includes(field)) {
+        if (field === "type") {
+            return isEditing ? (
+                <Select
+                    value={editingText}
+                    onChange={(value) => setEditingText(value)}
+                    style={{ width: 250 }}
+                    onBlur={() =>
+                        handleSave(
+                            selectedRecord,
+                            editingKey,
+                            filteredData,
+                            editingField,
+                            editingText,
+                            setFilteredData,
+                            setEditingKey,
+                            setEditingField,
+                            setEditingText
+                        )
+                    }
+                    autoFocus
+                >
+                    {types.map((item) => (
+                        <Option key={item} value={item}>
+                            {item}
+                        </Option>
+                    ))}
+
+                </Select>
+            ) : (
+                <div
+                    onDoubleClick={() =>
+                        handleEdit(
+                            record,
+                            record.key,
+                            field,
+                            text,
+                            setEditingKey,
+                            setEditingField,
+                            setEditingText,
+                            setSelectedRecord
+                        )
+                    }
+                >
+                    {text}
+                </div>
+            );
+        }
+        if (["idProvince", "nam_het_han",].includes(field)) {
             return isEditing ? (
                 <Select
                     value={editingText}
@@ -107,14 +147,7 @@ export const getColumns = ({
                     }
                     autoFocus
                 >
-                    {(field === "idProvince"
-                        ? provinces
-                        : field === "idDistrict"
-                            ? districts
-                            : field === "type"
-                                ? types
-                                : expiryYears
-                    ).map((item) => (
+                    {expiryYears.map((item) => (
                         <Option key={item} value={item}>
                             {item}
                         </Option>
