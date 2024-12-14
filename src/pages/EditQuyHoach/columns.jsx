@@ -26,6 +26,8 @@ export const getColumns = ({
     selectedRecord,
     setSelectedRecord,
     districtData,
+    fetchData,
+    setSelectedType
 }) => {
     const renderEditableCell = (text, record, field) => {
         const isEditing = record.key === editingKey && editingField === field;
@@ -262,11 +264,10 @@ export const getColumns = ({
 
     return [
         {
-            title: "STT",
-            dataIndex: "stt",
-            key: "stt",
+            title: "Id Quy Hoạch",
+            dataIndex: "key",
+            key: "key",
             width: 80,
-            render: (text, record) => renderEditableCell(text, record, "stt"),
         },
         {
             title: "Tên quy hoạch",
@@ -297,17 +298,38 @@ export const getColumns = ({
             render: (text, record) => renderEditableCell(text, record, "idProvince"),
         },
         {
-            title: "Loại quy hoạch",
-            dataIndex: "type",
+            title: (
+                <Select
+                    defaultValue="Quy hoạch xây dựng" // Giá trị mặc định
+                    onChange={(value) => {
+                        setSelectedType(value); // Cập nhật giá trị đã chọn
+                    }}
+                >
+                    <Option value="Quy hoạch xây dựng">Quy hoạch xây dựng</Option>
+                    <Option value="Bản đồ địa chính">Bản đồ địa chính</Option>
+                    <Option value="Kế hoạch sử dụng đất 2024">Kế hoạch sử dụng đất 2024</Option>
+                    <Option value="Quy hoạch 2030">Quy hoạch 2030</Option>
+                    <Option value="Quy hoạch tỉnh 2030">Quy hoạch tỉnh 2030</Option>
+                </Select>
+            ),
+            dataIndex: 'type',
             key: "type",
-            width: 300,
+            width: 250,
             render: (text, record) => renderEditableCell(text, record, "type"),
+            // Các thuộc tính khác của cột nếu cần
         },
+        // {
+        //     title: "Loại quy hoạch",
+        //     dataIndex: "type",
+        //     key: "type",
+        //     width: 250,
+        //     render: (text, record) => renderEditableCell(text, record, "type"),
+        // },
         {
             title: "Tọa độ (nếu có)",
             dataIndex: "location",
             key: "location",
-            width: 300,
+            width: 250,
             render: (text, record) =>
                 renderEditableCell(text, record, "location"),
         },

@@ -29,6 +29,7 @@ function EditQuyHoach() {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
+  const [selectedType, setSelectedType] = useState("Quy hoạch xây dựng");
 
 
   const [formData, setFormData] = useState({
@@ -58,15 +59,37 @@ function EditQuyHoach() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        "https://api.quyhoach.xyz/allquyhoach_type/quanhuyen?fbclid=IwY2xjawHIix5leHRuA2FlbQIxMAABHRzNtOl88ZQyi_VcvJhJvXo-up4Tj0FDkt48_dmcyG6GUzlr-iAmJC1r5A_aem_I5_TCC5Std2uDekYaUNR1Q"
-      );
+      let response
+
+      if (selectedType === "Quy hoạch 2030" || selectedType === "Kế hoạch sử dụng đất 2024") {
+        response = await axios.get(
+          "https://api.quyhoach.xyz/allquyhoach_type/quanhuyen?fbclid=IwY2xjawHIix5leHRuA2FlbQIxMAABHRzNtOl88ZQyi_VcvJhJvXo-up4Tj0FDkt48_dmcyG6GUzlr-iAmJC1r5A_aem_I5_TCC5Std2uDekYaUNR1Q"
+        );
+      }
+
+      if (selectedType === "Bản đồ địa chính") {
+        response = await axios.get(
+          "https://api.quyhoach.xyz/allquyhoach_type/diachinh?fbclid=IwY2xjawHKBI1leHRuA2FlbQIxMAABHa9tym2ejnKHb6JNl1drJEsGm2W2u7w9Q1Icgc3UhgDo7AWDmxmKzlFclQ_aem_l_Tyv1Af6t17O77KY2sR5Q"
+        );
+      }
+
+      if (selectedType === "Quy hoạch xây dựng") {
+        response = await axios.get(
+          "https://api.quyhoach.xyz/allquyhoach_type/quyhoach_xaydung?fbclid=IwY2xjawHKBKhleHRuA2FlbQIxMAABHT_gRYYSbejsr3xDZmyk0hmTGHiExfPJYTRmVq3yOXat06EMDKHdcQ_YDw_aem_YvWXxCMoC17Mp85mUS6MLA"
+        );
+      }
+
+      if (selectedType === "Quy hoạch tỉnh 2030") {
+        response = await axios.get(
+          "https://api.quyhoach.xyz/allquyhoach_type/tinh?fbclid=IwY2xjawHKA_NleHRuA2FlbQIxMAABHarkUZ_YhK-Zh2mMRP8FCEm7N7RGDMqkIPM9WBM4MWBK0GeAp7fc4qZ9Nw_aem_Pe_DsGDQWuGrsAENh7oQ3A"
+        );
+      }
+
       const data = response.data;
 
       // Chuyển đổi dữ liệu từ API sang định dạng phù hợp cho bảng
-      const formattedData = data.Posts.map((item, index) => ({
+      const formattedData = data.Posts.map((item) => ({
         key: item.id,
-        stt: index + 1,
         description: item.description || "N/A",
         idDistrict: item.idDistrict || "N/A",
         nam_het_han: item.nam_het_han || "N/A",
@@ -88,7 +111,7 @@ function EditQuyHoach() {
 
 
     fetchData();
-  }, []);
+  }, [selectedType]);
 
   useEffect(() => {
     const fetchDistrictData = async () => {
@@ -137,7 +160,9 @@ function EditQuyHoach() {
     handleSelectAllChange,
     selectedRecord,
     setSelectedRecord,
-    districtData
+    districtData,
+    fetchData,
+    setSelectedType
   });
 
   const removeVietnameseTones = (str) => {
@@ -233,7 +258,7 @@ function EditQuyHoach() {
       <Table
         dataSource={filteredData}
         columns={columns}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 1000 }}
         rowClassName={(record) => (checkedRows[record.key] ? "checked-row" : "")}
         style={{ minHeight: "400px" }}
         className="custom-table"
