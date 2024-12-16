@@ -25,16 +25,10 @@ const FolderList = () => {
           "https://api.quyhoach.xyz/liet_ke_thu_muc_chua_add_quyhoach"
         );
 
-        console.log("API Response: ", response.data);
-
         if (response.data) {
           const quyhoach2024 = response.data["2024"];
           const quyhoach2030 = response.data["2030"];
           const quyhoach_tinh = response.data["quyhoach_tinh"];
-
-          console.log("Quy hoach 2024: ", quyhoach2024);
-          console.log("Quy hoach 2030: ", quyhoach2030);
-          console.log("Quy hoach tinh: ", quyhoach_tinh);
 
           setData({
             2024: Array.isArray(quyhoach2024?.quyhoach_quanhuyen)
@@ -106,7 +100,7 @@ const FolderList = () => {
             key={index}
             onClick={() => {
               // console.log(`Đường dẫn API: ${item}, Loại: quyhoach_tinh`)
-              navigate('/editquyhoach');
+              navigate('/editquyhoach', { state: { path: item } })
             }}
             className="folder-item"
           >
@@ -124,6 +118,7 @@ const FolderList = () => {
           <div
             key={index}
             onClick={() => {
+
               navigate('/editquyhoach', { state: { path: item } })
             }}
             className="folder-item"

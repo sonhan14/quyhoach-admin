@@ -30,7 +30,9 @@ function EditQuyHoach() {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState("Quy hoạch xây dựng");
-
+  const [selectedTypeInsert, setSelectedTypeInsert] = useState("Quy hoạch xây dựng");
+  const isDistrictDisabled = selectedTypeInsert === "Quy hoạch xây dựng" || selectedType === "Bản đồ địa chính" || selectedType === "Quy hoạch tỉnh 2030";
+  const [uniqueProvinces, setUniqueProvinces] = useState([]);
 
   const [formData, setFormData] = useState({
     description: "abc",
@@ -87,6 +89,9 @@ function EditQuyHoach() {
 
       const data = response.data;
 
+      console.log(response.data);
+
+
       // Chuyển đổi dữ liệu từ API sang định dạng phù hợp cho bảng
       const formattedData = data.Posts.map((item) => ({
         key: item.id,
@@ -119,9 +124,11 @@ function EditQuyHoach() {
         const response = await axios.get(
           "https://api.quyhoach.xyz/ma_quan_huyen_tinh"
         );
-        console.log(response.data.quanhuyen);
+        console.log(response.data);
 
         setDistrictData(response.data.quanhuyen);
+
+        setUniqueProvinces(response.data.tinhthanh);
       } catch (error) {
         console.error("Lỗi khi fetch API:", error);
       }
@@ -137,12 +144,13 @@ function EditQuyHoach() {
       (item) => item.DistrictID === value
     );
     if (selectedDistrictData) {
-      // Tạo danh sách mã tỉnh từ dữ liệu API
       setSelectedProvince(selectedDistrictData.ProvinceID);
     } else {
       setSelectedProvince("");
     }
   };
+
+
 
   const columns = getColumns({
     filteredData,
@@ -162,7 +170,8 @@ function EditQuyHoach() {
     setSelectedRecord,
     districtData,
     fetchData,
-    setSelectedType
+    setSelectedType,
+    selectedType
   });
 
   const removeVietnameseTones = (str) => {
@@ -200,33 +209,86 @@ function EditQuyHoach() {
       message.error("Vui lòng điền đầy đủ thông tin vào các trường bắt buộc!");
       return;
     }
-    const updatedFormData = {
-      ...formData,
-      idDistrict: selectedDistrict, // Gán mã huyện đã chọn
-      idProvince: selectedProvince, // Gán mã tỉnh đã chọn
-    };
-    console.log("Form Data Saved: ", formData);
-    try {
-      // Tạo form-data để gửi lên server
-      const insertData = new FormData();
-      insertData.append("description", updatedFormData.description);
-      insertData.append("idDistrict", updatedFormData.idDistrict);
-      insertData.append("idProvince", updatedFormData.idProvince);
-      insertData.append("huyen_image", updatedFormData.huyen_image);
-      insertData.append("nam_het_han", updatedFormData.nam_het_han);
-      insertData.append("type", updatedFormData.type);
-      insertData.append("zoom", updatedFormData.zoom);
-      insertData.append("location", updatedFormData.location);
 
-      await axios.post(
-        `https://api.quyhoach.xyz/insert_quyhoach_quanhuyen`,
-        insertData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // Đảm bảo header đúng
-          },
-        }
-      );
+
+    try {
+
+      if (selectedTypeInsert === "Quy hoạch xây dựng") {
+        const insertData = new FormData();
+        insertData.append("description", formData.description);
+        insertData.append("idProvince", selectedProvince);
+        insertData.append("tinh_image", formData.huyen_image);
+        insertData.append("type", formData.type);
+        insertData.append("location", formData.location);
+
+        await axios.post(
+          `https://api.quyhoach.xyz/insert_quyhoach_xaydung`,
+          insertData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+      if (selectedTypeInsert === "Quy hoạch tỉnh 2030") {
+        const insertData = new FormData();
+        insertData.append("description", formData.description);
+        insertData.append("idProvince", selectedProvince);
+        insertData.append("tinh_image", formData.huyen_image);
+        insertData.append("type", formData.type);
+        insertData.append("location", formData.location);
+        await axios.post(
+          `https://api.quyhoach.xyz/insert_quyhoach_tinh`,
+          insertData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+
+      if (selectedTypeInsert === "Bản đồ địa chính") {
+        const insertData = new FormData();
+        insertData.append("description", formData.description);
+        insertData.append("idProvince", selectedProvince);
+        insertData.append("tinh_image", formData.huyen_image);
+        insertData.append("type", formData.type);
+        insertData.append("location", formData.location);
+        await axios.post(
+          `https://api.quyhoach.xyz/insert_bando_diachinh`,
+          insertData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+
+
+      if (selectedType === "Quy hoạch 2030" || selectedType === "Kế hoạch sử dụng đất 2024") {
+        const insertData = new FormData();
+        insertData.append("description", formData.description);
+        insertData.append("idDistrict", selectedDistrict);
+        insertData.append("idProvince", selectedProvince);
+        insertData.append("huyen_image", formData.huyen_image);
+        insertData.append("nam_het_han", formData.nam_het_han);
+        insertData.append("type", formData.type);
+        insertData.append("zoom", formData.zoom);
+        insertData.append("location", formData.location);
+        await axios.post(
+          `https://api.quyhoach.xyz/insert_quyhoach_quanhuyen`,
+          insertData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+
 
       message.success("Dữ liệu đã được lưu!");
       fetchData();
@@ -277,11 +339,12 @@ function EditQuyHoach() {
             className="select-small"
             placeholder="Mã quận/huyện"
             value={selectedDistrict}
-
+            disabled={isDistrictDisabled}
+            style={{ backgroundColor: 'white', borderRadius: 6, color: 'black' }}
           >
             {districtData.map((item) => (
               <Option key={item.DistrictID} value={item.DistrictID}>
-                {item.DistrictID}
+                {item.DistrictID} - {item.DistrictName}
               </Option>
             ))}
           </Select>
@@ -290,16 +353,20 @@ function EditQuyHoach() {
             className="select-small"
             placeholder="Mã tỉnh"
             value={selectedProvince}
-
             onChange={(value) => setSelectedProvince(value)}
-            disabled
+            disabled={!isDistrictDisabled}
             style={{ backgroundColor: 'white', borderRadius: 6, color: 'black' }}
           >
-            {selectedProvince && (
+            {selectedProvince && !isDistrictDisabled && (
               <Option key={selectedProvince} value={selectedProvince}>
                 {selectedProvince}
               </Option>
             )}
+            {isDistrictDisabled && uniqueProvinces.map((item) => (
+              <Option key={item.ProvinceID} value={item.ProvinceID}>
+                {item.ProvinceID} - {item.ProvinceName}
+              </Option>
+            ))}
           </Select>
 
           <Button type="primary"
@@ -320,10 +387,10 @@ function EditQuyHoach() {
           </Select>
 
           <Select
-            onChange={(value) => handleChange("type", value)}
+            onChange={(value) => { handleChange("type", value); setSelectedTypeInsert(value) }}
             className="select-medium"
             defaultValue={formData.type}
-
+            value={selectedTypeInsert}
           >
 
             <Option value="Quy hoạch xây dựng">Quy hoạch xây dựng</Option>
@@ -345,13 +412,14 @@ function EditQuyHoach() {
                   checkedRows,
                   setFilteredData,
                   setCheckedRows,
-                  setSelectAllChecked
+                  setSelectAllChecked,
+                  selectedType
                 )
               }
             >
               Xóa
             </Button>
-            <Button type="primary" className="button-green" onClick={handleSave}>Sửa</Button>
+            <Button type="primary" className="button-green" onClick={handleSave}>Thêm</Button>
           </div>
         </div>
 
@@ -379,6 +447,7 @@ function EditQuyHoach() {
         setSelectedDistrict={setSelectedDistrict}
         setSelectedProvince={setSelectedProvince}
       />
+
 
     </div>
   );

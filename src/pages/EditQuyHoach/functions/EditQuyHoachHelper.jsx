@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const handleCheckboxChange = (record, checked, setCheckedRows) => {
     if (checked) {
-        setCheckedRows((prevCheckedRows) => ({ ...prevCheckedRows, [record.key]: true }));
+        setCheckedRows((prevCheckedRows) => ({ ...prevCheckedRows, [record.key]: record.key }));
     } else {
         setCheckedRows((prevCheckedRows) => {
             const newCheckedRows = { ...prevCheckedRows };
@@ -49,7 +49,8 @@ export const handleSave = async (
     setFilteredData,
     setEditingKey,
     setEditingField,
-    setEditingText
+    setEditingText,
+    selectedType,
 ) => {
     if (!editingKey) return;
 
@@ -76,20 +77,58 @@ export const handleSave = async (
             if (editingField === "nam_het_han") {
                 formData.append('nam_het_han', editingText);
                 console.log(editingText);
-
             }
 
 
             // Making the API call with form-data
-            const response = await axios.post(
-                `https://api.quyhoach.xyz/edit_quyhoach_type/quanhuyen/${selectedRecord.key}`,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
-                    },
-                }
-            );
+            let response;
+            if (selectedType === "Quy hoạch 2030" || selectedType === "Kế hoạch sử dụng đất 2024") {
+                response = await axios.post(
+                    `https://api.quyhoach.xyz/edit_quyhoach_type/quanhuyen/${selectedRecord.key}`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                        },
+                    }
+                );
+            }
+
+            if (selectedType === "Quy hoạch tỉnh 2030") {
+                response = await axios.post(
+                    `https://api.quyhoach.xyz/edit_quyhoach_type/tinh/${selectedRecord.key}`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                        },
+                    }
+                );
+            }
+
+            if (selectedType === "Bản đồ địa chính") {
+                response = await axios.post(
+                    `https://api.quyhoach.xyz/edit_quyhoach_type/diachinh/${selectedRecord.key}`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                        },
+                    }
+                );
+            }
+
+            if (selectedType === "Quy hoạch xây dựng") {
+                response = await axios.post(
+                    `https://api.quyhoach.xyz/edit_quyhoach_type/xaydung/${selectedRecord.key}`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                        },
+                    }
+                );
+            }
 
             // Handling different response status codes
             if (response.status === 200) {
@@ -112,11 +151,46 @@ export const handleSave = async (
 };
 
 
-export const handleDelete = (filteredData, checkedRows, setFilteredData, setCheckedRows, setSelectAllChecked) => {
-    const remainingRows = filteredData.filter(
-        (item) => !checkedRows[item.key]
-    );
-    setFilteredData(remainingRows);
-    setCheckedRows({});
-    setSelectAllChecked(false);
+export const handleDelete = async (filteredData, checkedRows, setFilteredData, setCheckedRows, setSelectAllChecked, selectedType) => {
+
+    const keysToDelete = Object.keys(checkedRows);
+
+    try {
+        const deletePromises = keysToDelete.map(async (key) => {
+            if (selectedType === "Quy hoạch tỉnh 2030") {
+                const response = await axios.post(`https://api.quyhoach.xyz/remove_quyhoach/tinh/${key}`);
+                return response;
+            }
+            if (selectedType === "Quy hoạch 2030" || selectedType === "Kế hoạch sử dụng đất 2024") {
+                const response = await axios.post(`https://api.quyhoach.xyz/remove_quyhoach/quanhuyen/${key}`);
+                return response;
+            }
+            if (selectedType === "Bản đồ địa chính") {
+                const response = await axios.post(`https://api.quyhoach.xyz/remove_quyhoach/diachinh/${key}`);
+                return response;
+            }
+            if (selectedType === "Quy hoạch xây dựng") {
+                const response = await axios.post(`https://api.quyhoach.xyz/remove_quyhoach/xaydung/${key}`);
+                return response;
+            }
+
+        });
+
+        // Chờ tất cả các yêu cầu xóa hoàn thành
+        const responses = await Promise.all(deletePromises);
+        // Kiểm tra phản hồi và cập nhật dữ liệu
+        const allDeleted = responses.every(response => response.status === 200);
+        if (allDeleted) {
+            const remainingRows = filteredData.filter(
+                (item) => !checkedRows[item.key]
+            );
+            setFilteredData(remainingRows);
+            setCheckedRows({});
+            setSelectAllChecked(false);
+        } else {
+            console.error('Some API delete requests failed:', responses);
+        }
+    } catch (error) {
+        console.error('Error deleting data:', error);
+    }
 };

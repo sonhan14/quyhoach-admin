@@ -26,8 +26,8 @@ export const getColumns = ({
     selectedRecord,
     setSelectedRecord,
     districtData,
-    fetchData,
-    setSelectedType
+    setSelectedType,
+    selectedType
 }) => {
     const renderEditableCell = (text, record, field) => {
         const isEditing = record.key === editingKey && editingField === field;
@@ -52,7 +52,8 @@ export const getColumns = ({
                             setFilteredData,
                             setEditingKey,
                             setEditingField,
-                            setEditingText
+                            setEditingText,
+                            selectedType
                         )
                     }
                     autoFocus
@@ -98,7 +99,8 @@ export const getColumns = ({
                             setFilteredData,
                             setEditingKey,
                             setEditingField,
-                            setEditingText
+                            setEditingText,
+                            selectedType
                         )
                     }
                     autoFocus
@@ -144,7 +146,8 @@ export const getColumns = ({
                             setFilteredData,
                             setEditingKey,
                             setEditingField,
-                            setEditingText
+                            setEditingText,
+                            selectedType
                         )
                     }
                     autoFocus
@@ -189,7 +192,8 @@ export const getColumns = ({
                             setFilteredData,
                             setEditingKey,
                             setEditingField,
-                            setEditingText
+                            setEditingText,
+                            selectedType
                         )
                     }
                     autoFocus
@@ -224,7 +228,8 @@ export const getColumns = ({
                         setFilteredData,
                         setEditingKey,
                         setEditingField,
-                        setEditingText
+                        setEditingText,
+                        selectedType
                     )
                 }
                 onBlur={() =>
@@ -237,7 +242,8 @@ export const getColumns = ({
                         setFilteredData,
                         setEditingKey,
                         setEditingField,
-                        setEditingText
+                        setEditingText,
+                        selectedType
                     )
                 }
                 autoFocus
@@ -360,8 +366,9 @@ export const getColumns = ({
             render: (_, record) => (
                 <Checkbox
                     checked={checkedRows[record.key]}
-                    onChange={(e) =>
+                    onChange={(e) => {
                         handleCheckboxChange(record, e.target.checked, setCheckedRows)
+                    }
                     }
                 />
             ),
