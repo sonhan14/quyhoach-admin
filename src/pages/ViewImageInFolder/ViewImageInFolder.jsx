@@ -1,23 +1,26 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import imgFolder from "../../assets/folder.png";
 import Search from "../../components/Search/Search.jsx";
-import "./ViewListImage.css";
-import { useNavigate } from "react-router-dom";
+import "./ViewImageInFolder.css";
+import { useNavigate, useParams } from "react-router-dom";
 
-const ImageListFolder = () => {
+const ViewImageInFolder = () => {
+    const { city, level, id } = useParams();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredData, setFilteredData] = useState([]);
+    const [imageUrls, setImageUrls] = useState([]);
+    const [full_path, setFullPath] = useState("");
     const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const formData = new FormData();
-                formData.append("duongdan", ""); // Thay thế đường dẫn ở đây
+                formData.append("duongdan", `${city}/${level}/${id}`); // Thay thế đường dẫn ở đây
 
                 const response = await axios.post(
                     "https://api.quyhoach.xyz/view_quyhoach_tinh_image_all",
@@ -29,27 +32,65 @@ const ImageListFolder = () => {
                     }
                 );
 
-                console.log(response.data);
-
 
                 if (response.data) {
-                    const { full_path, quyhoach } = response.data;
-
-                    const quyhoachData = quyhoach.map(item => `${item}`);
-                    setData(quyhoachData);
-
+                    const { full_path, png_list } = response.data;
+                    setData(png_list);
+                    setFullPath(full_path)
                 } else {
                     setError("Dữ liệu không hợp lệ hoặc không có dữ liệu.");
                 }
             } catch (error) {
                 setError("Lỗi khi lấy dữ liệu: " + error.message);
             } finally {
-                setLoading(false);
+                setLoading(true);
             }
         };
 
         fetchData();
-    }, []);
+    }, [city, level, id]);
+
+    useEffect(() => {
+        const fetchImages = async () => {
+            const urls = [];
+            const promises = [];
+
+            for (const item of data) {
+                const formData = new FormData();
+                formData.append("link_folder", full_path);
+                formData.append("name_anh", `${item}`);
+
+
+                const promise = axios.post(
+                    "https://api.quyhoach.xyz/load_image_in_folder",
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                        responseType: "blob",
+                    }
+                ).then(response => {
+                    const url = URL.createObjectURL(response.data);
+                    urls.push(url);
+                }).catch(error => {
+                    console.error("Lỗi khi lấy hình ảnh: " + error.message);
+                });
+
+                promises.push(promise);
+            }
+
+
+            await Promise.all(promises);
+            setImageUrls(urls);
+            setLoading(false);
+        };
+
+        if (data.length > 0) {
+            setLoading(true);
+            fetchImages();
+        }
+    }, [data]);
 
     useEffect(() => {
         // Lọc dữ liệu khi có tìm kiếm
@@ -87,7 +128,7 @@ const ImageListFolder = () => {
                     }}
                     className="folder-item"
                 >
-                    <img src={imgFolder} alt="Folder Icon" className="folder-icon" />
+                    <img src={imageUrls[index]} alt={`Image ${item}`} className="folder-icon" />
                     <span className="folder-text">
                         {item}
                     </span>
@@ -107,4 +148,4 @@ const ImageListFolder = () => {
     );
 };
 
-export default ImageListFolder;
+export default ViewImageInFolder;

@@ -3,12 +3,12 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import FolderList from "./pages/ViewListFolder/ViewListFolder.jsx";
 import EditQuyHoach from "./pages/EditQuyHoach/EditQuyHoach.jsx";
 import ImageListFolder from "./pages/ViewListImage/ViewListImage.jsx";
 import Home from "./pages/Home/index.jsx";
+import ViewImageInFolder from "./pages/ViewImageInFolder/ViewImageInFolder.jsx";
 
 function App() {
   return (
@@ -18,6 +18,7 @@ function App() {
         <Route path="/listfolders" element={<FolderList />} />
         <Route path="/editquyhoach" element={<EditQuyHoach />} />
         <Route path="/imagefolderlist" element={<ImageListFolder />} />
+        <Route path="/viewinmageinfolder/:city/:level/:id" element={<ViewImageInFolder />} />
       </Routes>
     </Router>
   );
