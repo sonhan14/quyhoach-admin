@@ -71,6 +71,9 @@ const ImageListFolder = () => {
       fetchData(tinh);
       if (quyhoach) {
         fetchData(`${tinh}/${quyhoach}`);
+        if (folder) {
+          fetchData(`${tinh}/${quyhoach}/${folder}`);
+        }
       }
     } else {
       fetchData();
@@ -93,7 +96,10 @@ const ImageListFolder = () => {
         <div
           key={index}
           onClick={() => {
-            if (searchParams.get("tinh")) {
+            if (searchParams.get("quyhoach")) {
+              searchParams.set("folder", item);
+              setSearchParams(searchParams);
+            } else if (searchParams.get("tinh")) {
               searchParams.set("quyhoach", item);
               setSearchParams(searchParams);
             } else {
