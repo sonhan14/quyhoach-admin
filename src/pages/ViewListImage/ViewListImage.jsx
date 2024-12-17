@@ -1,46 +1,43 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import imgFolder from "../../assets/folder.png";
+import Search from "../../components/Search/Search.jsx";
 import "./ViewListImage.css";
 import { useNavigate } from "react-router-dom";
-import Search from "../../components/Search/Search";
 
 const ImageListFolder = () => {
-    const [data, setData] = useState({
-        2024: [],
-        2030: [],
-        quyhoach_tinh: [],
-    });
+    const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedType, setSelectedType] = useState("");
-    const [searchTerm, setSearchTerm] = useState(""); // Thêm state tìm kiếm
-    const [filteredData, setFilteredData] = useState([]); // Thêm state để lưu dữ liệu đã lọc
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredData, setFilteredData] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(
-                    "https://api.quyhoach.xyz/liet_ke_thu_muc_chua_add_quyhoach"
+                const formData = new FormData();
+                formData.append("duongdan", ""); // Thay thế đường dẫn ở đây
+
+                const response = await axios.post(
+                    "https://api.quyhoach.xyz/view_quyhoach_tinh_image_all",
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    }
                 );
 
-                if (response.data) {
-                    const quyhoach2024 = response.data["2024"];
-                    const quyhoach2030 = response.data["2030"];
-                    const quyhoach_tinh = response.data["quyhoach_tinh"];
+                console.log(response.data);
 
-                    setData({
-                        2024: Array.isArray(quyhoach2024?.quyhoach_quanhuyen)
-                            ? quyhoach2024.quyhoach_quanhuyen
-                            : [],
-                        2030: Array.isArray(quyhoach2030?.quyhoach_quanhuyen)
-                            ? quyhoach2030.quyhoach_quanhuyen
-                            : [],
-                        quyhoach_tinh: Array.isArray(quyhoach_tinh?.quyhoach_quanhuyen)
-                            ? quyhoach_tinh.quyhoach_quanhuyen
-                            : [],
-                    });
+
+                if (response.data) {
+                    const { full_path, quyhoach } = response.data;
+
+                    const quyhoachData = quyhoach.map(item => `${item}`);
+                    setData(quyhoachData);
+
                 } else {
                     setError("Dữ liệu không hợp lệ hoặc không có dữ liệu.");
                 }
@@ -55,9 +52,9 @@ const ImageListFolder = () => {
     }, []);
 
     useEffect(() => {
+        // Lọc dữ liệu quy hoạch 2024 khi có tìm kiếm
         if (searchTerm) {
-            // Lọc dữ liệu khi có tìm kiếm
-            const filtered = data[selectedType]?.filter((item) => {
+            const filtered = data.filter((item) => {
                 const parts = item.split("/");
                 const province = parts[5]?.toLowerCase() || "";
                 const district = parts[6]?.toLowerCase() || "";
@@ -66,16 +63,12 @@ const ImageListFolder = () => {
             });
             setFilteredData(filtered || []);
         } else {
-            setFilteredData(data[selectedType] || []);
+            setFilteredData(data || []);
         }
-    }, [searchTerm, selectedType, data]);
+    }, [searchTerm, data]);
 
-    const handleTypeClick = (type) => {
-        setSelectedType(type);
-    };
 
     const renderContent = (data) => {
-
         if (loading) {
             return <p>Đang tải dữ liệu...</p>;
         }
@@ -89,49 +82,20 @@ const ImageListFolder = () => {
         }
 
         return data.map((item, index) => {
-            const parts = item.split("/");
-
-            if (selectedType === "quyhoach_tinh") {
-                const province = parts[5]; // Tỉnh (theo đường dẫn của bạn)
-                const district = parts[6];
-
-                return (
-                    <div
-                        key={index}
-                        onClick={() => {
-                            // console.log(`Đường dẫn API: ${item}, Loại: quyhoach_tinh`)
-                            navigate('/editquyhoach', { state: { path: item } })
-                        }}
-                        className="folder-item"
-                    >
-                        <img src={imgFolder} alt="Folder Icon" className="folder-icon" />
-                        <span className="folder-text">
-                            Quy hoạch {province} {district}
-                        </span>
-                    </div>
-                );
-            } else if (selectedType === "2024" || selectedType === "2030") {
-                const province = parts[5];
-                const district = parts[6];
-
-                return (
-                    <div
-                        key={index}
-                        onClick={() => {
-
-                            navigate('/editquyhoach', { state: { path: item } })
-                        }}
-                        className="folder-item"
-                    >
-                        <img src={imgFolder} alt="Folder Icon" className="folder-icon" />
-                        <span className="folder-text">
-                            Quy hoạch {province} - {district}
-                        </span>
-                    </div>
-                );
-            }
-
-            return null;
+            return (
+                <div
+                    key={index}
+                    onClick={() => {
+                        navigate('/editquyhoach', { state: { path: item } })
+                    }}
+                    className="folder-item"
+                >
+                    <img src={imgFolder} alt="Folder Icon" className="folder-icon" />
+                    <span className="folder-text">
+                        {item}
+                    </span>
+                </div>
+            );
         });
     };
 
@@ -139,16 +103,8 @@ const ImageListFolder = () => {
         <div className="folder-list-container">
             <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-            <div className="type-selector">
-                <button onClick={() => handleTypeClick("2024")}>Quy hoạch 2024</button>
-                <button onClick={() => handleTypeClick("2030")}>Quy hoạch 2030</button>
-                <button onClick={() => handleTypeClick("quyhoach_tinh")}>
-                    Quy hoạch Tỉnh
-                </button>
-            </div>
-
             <div className="folder-items-container">
-                {selectedType && <>{renderContent(filteredData)}</>}
+                {renderContent(filteredData)} {/* Luôn hiển thị dữ liệu quy hoạch 2024 */}
             </div>
         </div>
     );
