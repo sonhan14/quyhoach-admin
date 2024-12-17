@@ -8,7 +8,7 @@ function Home() {
         style={{
           display: "flex",
           justifyContent: "space-around",
-          marginTop: "50px",
+          marginTop: "40px",
         }}
       >
         <Button>
