@@ -18,7 +18,7 @@ function App() {
         <Route path="/listfolders" element={<FolderList />} />
         <Route path="/editquyhoach" element={<EditQuyHoach />} />
         <Route path="/imagefolderlist" element={<ImageListFolder />} />
-        <Route path="/viewinmageinfolder/:city/:level/:id" element={<ViewImageInFolder />} />
+        <Route path="/viewimageinfolder/:city/:level/:id" element={<ViewImageInFolder />} />
       </Routes>
     </Router>
   );
