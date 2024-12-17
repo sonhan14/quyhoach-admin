@@ -27,7 +27,6 @@ export const getColumns = ({
     setSelectedRecord,
     districtData,
     setSelectedType,
-    selectedType
 }) => {
     const renderEditableCell = (text, record, field) => {
         const isEditing = record.key === editingKey && editingField === field;
@@ -53,7 +52,6 @@ export const getColumns = ({
                             setEditingKey,
                             setEditingField,
                             setEditingText,
-                            selectedType
                         )
                     }
                     autoFocus
@@ -100,7 +98,6 @@ export const getColumns = ({
                             setEditingKey,
                             setEditingField,
                             setEditingText,
-                            selectedType
                         )
                     }
                     autoFocus
@@ -147,7 +144,6 @@ export const getColumns = ({
                             setEditingKey,
                             setEditingField,
                             setEditingText,
-                            selectedType
                         )
                     }
                     autoFocus
@@ -193,7 +189,6 @@ export const getColumns = ({
                             setEditingKey,
                             setEditingField,
                             setEditingText,
-                            selectedType
                         )
                     }
                     autoFocus
@@ -229,7 +224,6 @@ export const getColumns = ({
                         setEditingKey,
                         setEditingField,
                         setEditingText,
-                        selectedType
                     )
                 }
                 onBlur={() =>
@@ -243,7 +237,6 @@ export const getColumns = ({
                         setEditingKey,
                         setEditingField,
                         setEditingText,
-                        selectedType
                     )
                 }
                 autoFocus

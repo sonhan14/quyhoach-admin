@@ -50,87 +50,43 @@ export const handleSave = async (
     setEditingKey,
     setEditingField,
     setEditingText,
-    selectedType,
 ) => {
     if (!editingKey) return;
+    try {
+        // Making API call to update the data
+        const formData = new FormData();
+        if (editingField === "description") {
+            formData.append('description', editingText);
+        }
 
-    if (selectedRecord.type === "QUAN_HUYEN") {
-        try {
-            // Making API call to update the data
-            const formData = new FormData();
-            if (editingField === "description") {
-                formData.append('description', editingText);
-            }
+        if (editingField === "idProvince") {
+            formData.append('idProvince', editingText);
+        }
 
-            if (editingField === "idProvince") {
-                formData.append('idProvince', editingText);
-            }
+        if (editingField === "huyen_image") {
+            formData.append('huyen_image', editingText);
+        }
 
-            if (editingField === "huyen_image") {
-                formData.append('huyen_image', editingText);
-            }
+        if (editingField === "idDistrict") {
+            formData.append('idDistrict', editingText);
+        }
 
-            if (editingField === "idDistrict") {
-                formData.append('idDistrict', editingText);
-            }
-
-            if (editingField === "nam_het_han") {
-                formData.append('nam_het_han', editingText);
-                console.log(editingText);
-            }
+        if (editingField === "nam_het_han") {
+            formData.append('nam_het_han', editingText);
+        }
 
 
-            // Making the API call with form-data
-            let response;
-            if (selectedType === "Quy hoạch 2030" || selectedType === "Kế hoạch sử dụng đất 2024") {
-                response = await axios.post(
-                    `https://api.quyhoach.xyz/edit_quyhoach_type/quanhuyen/${selectedRecord.key}`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
-                        },
-                    }
-                );
-            }
+        if (selectedRecord.type === "QUAN_HUYEN") {
+            const response = await axios.post(
+                `https://api.quyhoach.xyz/edit_quyhoach_type/quanhuyen/${selectedRecord.key}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                    },
+                }
+            );
 
-            if (selectedType === "Quy hoạch tỉnh 2030") {
-                response = await axios.post(
-                    `https://api.quyhoach.xyz/edit_quyhoach_type/tinh/${selectedRecord.key}`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
-                        },
-                    }
-                );
-            }
-
-            if (selectedType === "Bản đồ địa chính") {
-                response = await axios.post(
-                    `https://api.quyhoach.xyz/edit_quyhoach_type/diachinh/${selectedRecord.key}`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
-                        },
-                    }
-                );
-            }
-
-            if (selectedType === "Quy hoạch xây dựng") {
-                response = await axios.post(
-                    `https://api.quyhoach.xyz/edit_quyhoach_type/xaydung/${selectedRecord.key}`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
-                        },
-                    }
-                );
-            }
-
-            // Handling different response status codes
             if (response.status === 200) {
                 const updatedData = filteredData.map((item) =>
                     item.key === editingKey ? { ...item, [editingField]: editingText } : item
@@ -143,11 +99,91 @@ export const handleSave = async (
             } else {
                 console.error('API update failed:', response);
             }
-        } catch (error) {
-            console.error('Error updating data:', error);
         }
-    }
 
+        if (selectedRecord.type === "QUYHOACH_TINH") {
+            const response = await axios.post(
+                `https://api.quyhoach.xyz/edit_quyhoach_type/tinh/${selectedRecord.key}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                const updatedData = filteredData.map((item) =>
+                    item.key === editingKey ? { ...item, [editingField]: editingText } : item
+                );
+
+                setFilteredData(updatedData);
+                setEditingKey(null);
+                setEditingField(null);
+                setEditingText("");
+            } else {
+                console.error('API update failed:', response);
+            }
+        }
+
+        if (selectedRecord.type === "DULIEU_DIACHINH") {
+            const response = await axios.post(
+                `https://api.quyhoach.xyz/edit_quyhoach_type/diachinh/${selectedRecord.key}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                const updatedData = filteredData.map((item) =>
+                    item.key === editingKey ? { ...item, [editingField]: editingText } : item
+                );
+
+                setFilteredData(updatedData);
+                setEditingKey(null);
+                setEditingField(null);
+                setEditingText("");
+            } else {
+                console.error('API update failed:', response);
+            }
+        }
+
+        if (selectedRecord.type === "QUYHOACH_XAYDUNG") {
+            console.log('ok');
+
+            const response = await axios.post(
+                `https://api.quyhoach.xyz/edit_quyhoach_type/xaydung/${selectedRecord.key}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data', // Ensure the content type is set to form-data
+                    },
+                }
+            );
+
+            console.log(response);
+
+
+            if (response.status === 200) {
+                const updatedData = filteredData.map((item) =>
+                    item.key === editingKey ? { ...item, [editingField]: editingText } : item
+                );
+
+                setFilteredData(updatedData);
+                setEditingKey(null);
+                setEditingField(null);
+                setEditingText("");
+            } else {
+                console.error('API update failed:', response);
+            }
+        }
+
+    } catch (error) {
+        console.error('Error updating data:', error);
+    }
 };
 
 
