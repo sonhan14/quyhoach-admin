@@ -1,0 +1,112 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.col-8,
+.col-4 {
+  padding: 6px;
+}
+.col-8 {
+  flex: 8;
+}
+
+.col-4 {
+  flex: 4;
+}
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.refresh-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 24px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.user-avatar {
+  position: relative;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.online {
+  background-color: green;
+}
+
+.offline {
+  background-color: red;
+}
+
+.user-details {
+  margin-left: 10px;
+  flex-grow: 1;
+}
+
+.notifications {
+  margin-left: auto;
+}
+
+.notification-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.new-register {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+input[type="checkbox"] {
+  margin-right: 5px;
+  accent-color: #007bff;
+}
+
+label {
+  margin-right: 15px;
+  color: white;
+}
+.user-details h4 {
+  margin: 0;
+}
+
+.user-details p {
+  margin: 0;
+}
+.user-details i {
+  font-size: 14px;
+}
