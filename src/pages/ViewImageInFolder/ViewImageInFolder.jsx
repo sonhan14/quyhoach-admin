@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Search from "../../components/Search/Search.jsx";
 import "./ViewImageInFolder.css";
@@ -19,6 +19,8 @@ const ViewImageInFolder = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [isSelecting, setIsSelecting] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const fileInputRef = useRef(null);
     let longPressTimer = null;
 
 
@@ -125,7 +127,7 @@ const ViewImageInFolder = () => {
                 }
                 return prev;
             });
-        }, 500); // Thời gian để xác định long press
+        }, 500);
     };
 
     const handleDeleteSelected = async () => {
@@ -206,6 +208,52 @@ const ViewImageInFolder = () => {
         setSelectedItem(null);
     };
 
+    const handleDownloadImage = () => {
+        const link = document.createElement('a');
+        link.href = selectedItem;
+        link.download = selectedImage.split('/').pop();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+        const newImageUrl = URL.createObjectURL(event.target.files[0]);
+        setSelectedItem(newImageUrl);
+    };
+
+    const handleUploadImage = async () => {
+        if (!selectedFile) {
+            alert("Vui lòng chọn một file ảnh để tải lên.");
+            return;
+        }
+        const formData = new FormData();
+        formData.append("duongdan", `${full_path}/${selectedImage}`); // Đường dẫn đến ảnh cần sửa
+        formData.append("file", selectedFile); // File ảnh mới
+
+        try {
+            const response = await axios.post("https://api.quyhoach.xyz/upload_image", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data.success) {
+                const updatedImageUrls = imageUrls.map((url, index) => {
+                    return index === data.indexOf(selectedImage) ? URL.createObjectURL(selectedFile) : url;
+                });
+                setImageUrls(updatedImageUrls);
+                closePopup()
+            } else {
+                alert("Có lỗi xảy ra khi sửa ảnh.");
+            }
+        } catch (error) {
+            console.error("Lỗi khi tải lên ảnh: " + error.message);
+            alert("Có lỗi xảy ra khi tải lên ảnh.");
+        }
+    };
+
     const renderContent = (data) => {
         if (loading) {
             return <p>Đang tải dữ liệu...</p>;
@@ -253,7 +301,7 @@ const ViewImageInFolder = () => {
                 </div>
             )}
             <div className="folder-items-container">
-                {renderContent(filteredData)} {/* Luôn hiển thị dữ liệu quy hoạch 2024 */}
+                {renderContent(filteredData)}
             </div>
 
             {isPopupOpen && (
@@ -263,9 +311,11 @@ const ViewImageInFolder = () => {
                         <h2>{selectedItem}</h2>
                         <div className="popup-buttons">
                             <button className="delete-button" onClick={handleDeleteImage}>Xóa</button>
-                            <button className="download-button">Tải về</button>
-                            <button className="edit-button">Sửa</button>
+                            <button className="download-button" onClick={handleDownloadImage}>Tải về</button>
+                            <button className="choose-file-button" onClick={() => fileInputRef.current.click()}>Chọn file</button>
+                            <button className="edit-button" onClick={handleUploadImage}>Sửa</button>
                         </div>
+                        <input type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef} />
                         <button className="close-popup" onClick={closePopup}>Đóng</button>
                     </div>
                 </div>
