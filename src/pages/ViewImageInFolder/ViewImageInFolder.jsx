@@ -17,66 +17,71 @@ const ViewImageInFolder = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isPopupAddOpen, setIsPopupAddOpen] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [isSelecting, setIsSelecting] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const fileInputRef = useRef(null);
     let longPressTimer = null;
 
+    const fetchData = async () => {
+        try {
+            const formData = new FormData();
+            formData.append("duongdan", `${city}/${level}/${id}`);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const formData = new FormData();
-                formData.append("duongdan", `${city}/${level}/${id}`);
-
-                const response = await axios.post(
-                    "https://api.quyhoach.xyz/view_quyhoach_tinh_image_all",
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    }
-                );
-
-
-                if (response.data) {
-                    const { full_path, png_list } = response.data;
-
-                    const sortedPngList = png_list.sort((a, b) => {
-                        const numA = parseInt(a.split('.')[0], 10);
-                        const numB = parseInt(b.split('.')[0], 10);
-                        return numA - numB;
-                    });
-
-                    setData(sortedPngList);
-                    setFullPath(full_path)
-                } else {
-                    setError("Dữ liệu không hợp lệ hoặc không có dữ liệu.");
+            const response = await axios.post(
+                "https://api.quyhoach.xyz/view_quyhoach_tinh_image_all",
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 }
-            } catch (error) {
-                setError("Lỗi khi lấy dữ liệu: " + error.message);
-            } finally {
-                setLoading(true);
+            );
+
+
+            if (response.data) {
+                const { full_path, png_list } = response.data;
+
+                const sortedPngList = png_list.sort((a, b) => {
+                    const numA = parseInt(a.split('.')[0], 10);
+                    const numB = parseInt(b.split('.')[0], 10);
+                    return numA - numB;
+                });
+                setData(sortedPngList);
+                setFullPath(full_path)
+            } else {
+                setError("Dữ liệu không hợp lệ hoặc không có dữ liệu.");
             }
-        };
+        } catch (error) {
+            setError("Lỗi khi lấy dữ liệu: " + error.message);
+        } finally {
+            setLoading(true);
+        }
+    };
+    useEffect(() => {
+
 
         fetchData();
     }, [city, level, id]);
 
     useEffect(() => {
-        const fetchImages = async () => {
-            const urls = [];
-            const promises = [];
+        if (data.length > 0) {
+            setLoading(true);
+            fetchImages();
+        }
+    }, [data]);
 
-            for (const item of data) {
-                const formData = new FormData();
-                formData.append("link_folder", full_path);
-                formData.append("name_anh", `${item}`);
+    const fetchImages = async () => {
+        const urls = [];
 
+        for (const item of data) {
+            const formData = new FormData();
+            formData.append("link_folder", full_path);
+            formData.append("name_anh", `${item}`);
 
-                const promise = axios.post(
+            try {
+                const response = await axios.post(
                     "https://api.quyhoach.xyz/load_image_in_folder",
                     formData,
                     {
@@ -85,27 +90,17 @@ const ViewImageInFolder = () => {
                         },
                         responseType: "blob",
                     }
-                ).then(response => {
-                    const url = URL.createObjectURL(response.data);
-                    urls.push(url);
-                }).catch(error => {
-                    console.error("Lỗi khi lấy hình ảnh: " + error.message);
-                });
-
-                promises.push(promise);
+                );
+                const url = URL.createObjectURL(response.data);
+                urls.push(url);
+            } catch (error) {
+                console.error("Lỗi khi lấy hình ảnh: " + error.message);
             }
-
-
-            await Promise.all(promises);
-            setImageUrls(urls);
-            setLoading(false);
-        };
-
-        if (data.length > 0) {
-            setLoading(true);
-            fetchImages();
         }
-    }, [data]);
+
+        setImageUrls(urls);
+        setLoading(false);
+    };
 
     useEffect(() => {
         if (searchTerm) {
@@ -148,7 +143,7 @@ const ViewImageInFolder = () => {
                 });
             }
 
-            setData((prev) => prev.filter(item => !selectedItems.includes(item)));
+            fetchData()
             setSelectedItems([]);
         } catch (error) {
             console.error("Lỗi khi xóa hình ảnh: " + error.message);
@@ -170,7 +165,7 @@ const ViewImageInFolder = () => {
                 },
             });
 
-            setData((prev) => prev.filter(item => item !== selectedItem.split('/').pop()));
+            fetchData()
             closePopup();
         } catch (error) {
             console.error("Lỗi khi xóa hình ảnh: " + error.message);
@@ -190,6 +185,10 @@ const ViewImageInFolder = () => {
         setSelectedImage(item)
     }
 
+    const handleOpenAddImage = () => {
+        setIsPopupAddOpen(true);
+    }
+
     const handleItemClick = (item) => {
         clearTimeout(longPressTimer);
         setSelectedItems((prev) => {
@@ -205,6 +204,11 @@ const ViewImageInFolder = () => {
 
     const closePopup = () => {
         setIsPopupOpen(false);
+        setSelectedItem(null);
+    };
+
+    const closeAddPopup = () => {
+        setIsPopupAddOpen(false);
         setSelectedItem(null);
     };
 
@@ -229,22 +233,53 @@ const ViewImageInFolder = () => {
             return;
         }
         const formData = new FormData();
-        formData.append("duongdan", `${full_path}/${selectedImage}`); // Đường dẫn đến ảnh cần sửa
-        formData.append("file", selectedFile); // File ảnh mới
+        console.log(selectedFile.name);
+
+        formData.append("link_change", `${full_path}/${selectedImage}`);
+        formData.append("image_upload", selectedFile);
 
         try {
-            const response = await axios.post("https://api.quyhoach.xyz/upload_image", formData, {
+            const response = await axios.post("https://api.quyhoach.xyz/upload_image_change", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
-            if (response.data.success) {
+
+            if (response.status === 200) {
                 const updatedImageUrls = imageUrls.map((url, index) => {
                     return index === data.indexOf(selectedImage) ? URL.createObjectURL(selectedFile) : url;
                 });
                 setImageUrls(updatedImageUrls);
                 closePopup()
+            } else {
+                alert("Có lỗi xảy ra khi sửa ảnh.");
+            }
+        } catch (error) {
+            console.error("Lỗi khi tải lên ảnh: " + error.message);
+            alert("Có lỗi xảy ra khi tải lên ảnh.");
+        }
+    };
+
+    const handleAddImage = async () => {
+        if (!selectedFile) {
+            alert("Vui lòng chọn một file ảnh để tải lên.");
+            return;
+        }
+        const formData = new FormData();
+
+        formData.append("link_change", `${full_path}/${selectedFile.name}`);
+        formData.append("image_upload", selectedFile);
+
+        try {
+            const response = await axios.post("https://api.quyhoach.xyz/upload_image_change", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.status === 200) {
+                fetchData()
+                closeAddPopup()
             } else {
                 alert("Có lỗi xảy ra khi sửa ảnh.");
             }
@@ -294,6 +329,12 @@ const ViewImageInFolder = () => {
     return (
         <div className="folder-list-container">
             <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+
+            {!isSelecting && (
+                <div className="button-check-container">
+                    <button className="delete-button-check" onClick={handleOpenAddImage}>Thêm ảnh</button>
+                </div>
+            )}
             {isSelecting && (
                 <div className="button-check-container">
                     <button className="delete-button-check" onClick={handleDeleteSelected}>Xóa</button>
@@ -317,6 +358,21 @@ const ViewImageInFolder = () => {
                         </div>
                         <input type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef} />
                         <button className="close-popup" onClick={closePopup}>Đóng</button>
+                    </div>
+                </div>
+            )}
+
+            {isPopupAddOpen && (
+                <div className="popup-overlay">
+                    <div className="popup-content">
+                        <img src={selectedItem} alt="Large View" className="large-image" />
+                        <h2>{selectedItem}</h2>
+                        <div className="popup-buttons">
+                            <button className="choose-file-button" onClick={() => fileInputRef.current.click()}>Chọn file</button>
+                            <button className="edit-button" onClick={handleAddImage}>Thêm</button>
+                        </div>
+                        <input type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef} />
+                        <button className="close-popup" onClick={closeAddPopup}>Đóng</button>
                     </div>
                 </div>
             )}

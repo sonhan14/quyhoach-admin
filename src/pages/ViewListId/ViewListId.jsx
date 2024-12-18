@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import imgFolder from "../../assets/folder.png";
 import Search from "../../components/Search/Search.jsx";
-import "./ViewListImage.css";
-import { useNavigate } from "react-router-dom";
+import "./ViewListId.css";
+import { useNavigate, useParams } from "react-router-dom";
 
-const ImageListFolder = () => {
+const IDListFolder = () => {
+    const { city, level } = useParams();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -13,10 +14,12 @@ const ImageListFolder = () => {
     const [filteredData, setFilteredData] = useState([]);
 
     const navigate = useNavigate();
+
     const fetchData = async () => {
         try {
             const formData = new FormData();
-            formData.append("duongdan", "");
+            formData.append("duongdan", city + '/' + level);
+
 
             const response = await axios.post(
                 "https://api.quyhoach.xyz/view_quyhoach_tinh_image_all",
@@ -31,6 +34,7 @@ const ImageListFolder = () => {
             if (response.data) {
                 const { full_path, quyhoach } = response.data;
                 const quyhoachData = quyhoach.map((item) => `${item}`);
+                quyhoachData.sort((a, b) => parseFloat(a) - parseFloat(b));
 
                 setData(quyhoachData);
             } else {
@@ -75,7 +79,7 @@ const ImageListFolder = () => {
                 <div
                     key={index}
                     onClick={() => {
-                        navigate(`/imagefolderlist/${item}`);
+                        navigate(`/imagefolderlist/${city}/${level}/${item}`);
                     }}
                     className="folder-item"
                 >
@@ -85,6 +89,7 @@ const ImageListFolder = () => {
             );
         });
     };
+
 
     return (
         <div className="folder-list-container">
@@ -98,4 +103,4 @@ const ImageListFolder = () => {
     );
 };
 
-export default ImageListFolder;
+export default IDListFolder;
