@@ -171,7 +171,6 @@ function EditQuyHoach() {
     districtData,
     fetchData,
     setSelectedType,
-    selectedType
   });
 
   const removeVietnameseTones = (str) => {
