@@ -17,7 +17,7 @@ const ImageListFolder = () => {
     const fetchData = async (url = "") => {
         try {
             const formData = new FormData();
-            formData.append("duongdan", url); // Thay thế đường dẫn ở đây
+            formData.append("duongdan", url);
 
             const response = await axios.post(
                 "https://api.quyhoach.xyz/view_quyhoach_tinh_image_all",
@@ -29,12 +29,15 @@ const ImageListFolder = () => {
                 }
             );
 
-            console.log(response.data);
-
             if (response.data) {
                 const { full_path, quyhoach } = response.data;
 
                 const quyhoachData = quyhoach.map((item) => `${item}`);
+
+                if (searchParams.get("quyhoach") || searchParams.get("tinh")) {
+                    quyhoachData.sort((a, b) => parseFloat(a) - parseFloat(b));
+                }
+
                 setData(quyhoachData);
             } else {
                 setError("Dữ liệu không hợp lệ hoặc không có dữ liệu.");

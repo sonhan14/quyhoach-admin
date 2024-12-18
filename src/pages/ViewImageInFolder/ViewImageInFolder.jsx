@@ -15,6 +15,7 @@ const ViewImageInFolder = () => {
     const [full_path, setFullPath] = useState("");
     const navigate = useNavigate();
     const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [isSelecting, setIsSelecting] = useState(false);
@@ -40,7 +41,14 @@ const ViewImageInFolder = () => {
 
                 if (response.data) {
                     const { full_path, png_list } = response.data;
-                    setData(png_list);
+
+                    const sortedPngList = png_list.sort((a, b) => {
+                        const numA = parseInt(a.split('.')[0], 10);
+                        const numB = parseInt(b.split('.')[0], 10);
+                        return numA - numB;
+                    });
+
+                    setData(sortedPngList);
                     setFullPath(full_path)
                 } else {
                     setError("Dữ liệu không hợp lệ hoặc không có dữ liệu.");
@@ -120,35 +128,76 @@ const ViewImageInFolder = () => {
         }, 500); // Thời gian để xác định long press
     };
 
-    const handleDeleteSelected = () => {
-        console.log(full_path + '/' + selectedItems[0]);
+    const handleDeleteSelected = async () => {
+        const confirmDelete = window.confirm("Bạn có chắc muốn xóa ảnh?");
+        if (!confirmDelete) {
+            return;
+        }
 
-        setData((prev) => prev.filter(item => !selectedItems.includes(item)));
-        setSelectedItems([]);
+        try {
+            for (const item of selectedItems) {
+                const formData = new FormData();
+                formData.append("duongdan", `${full_path}/${item}`);
+
+                await axios.post("https://api.quyhoach.xyz/remove_anh_folder", formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            }
+
+            setData((prev) => prev.filter(item => !selectedItems.includes(item)));
+            setSelectedItems([]);
+        } catch (error) {
+            console.error("Lỗi khi xóa hình ảnh: " + error.message);
+        }
     };
+
+    const handleDeleteImage = async () => {
+        const confirmDelete = window.confirm("Bạn có chắc muốn xóa ảnh?");
+        if (!confirmDelete) {
+            return;
+        }
+        try {
+            const formData = new FormData();
+            formData.append("duongdan", `${full_path}/${selectedImage}`);
+
+            await axios.post("https://api.quyhoach.xyz/remove_anh_folder", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            setData((prev) => prev.filter(item => item !== selectedItem.split('/').pop()));
+            closePopup();
+        } catch (error) {
+            console.error("Lỗi khi xóa hình ảnh: " + error.message);
+        }
+    };
+
 
     const handleExitSelection = () => {
         setIsSelecting(false);
         setSelectedItems([]);
     };
 
-
+    const handleItemClick1 = (item, image) => {
+        clearTimeout(longPressTimer);
+        setSelectedItem(image);
+        setIsPopupOpen(true);
+        setSelectedImage(item)
+    }
 
     const handleItemClick = (item) => {
         clearTimeout(longPressTimer);
-        if (!isSelecting) {
-            setSelectedItem(item);
-            setIsPopupOpen(true);
-        }
-        if (isSelecting) {
-            setSelectedItems((prev) => {
-                if (prev.includes(item)) {
-                    return prev.filter(i => i !== item);
-                } else {
-                    return [...prev, item];
-                }
-            });
-        }
+        setSelectedItems((prev) => {
+            if (prev.includes(item)) {
+                return prev.filter(i => i !== item);
+            } else {
+                return [...prev, item];
+            }
+        });
+
     };
 
 
@@ -175,7 +224,7 @@ const ViewImageInFolder = () => {
                 <div
                     key={index}
                     onMouseDown={() => handleItemPressStart(item)}
-                    onMouseUp={() => { !isSelecting ? handleItemClick(imageUrls[index]) : handleItemClick(item) }}
+                    onMouseUp={() => { isSelecting ? handleItemClick(imageUrls[index]) : handleItemClick1(item, imageUrls[index]) }}
                     onMouseLeave={() => clearTimeout(longPressTimer)}
                     className="folder-item"
                 >
@@ -213,7 +262,7 @@ const ViewImageInFolder = () => {
                         <img src={selectedItem} alt="Large View" className="large-image" />
                         <h2>{selectedItem}</h2>
                         <div className="popup-buttons">
-                            <button className="delete-button">Xóa</button>
+                            <button className="delete-button" onClick={handleDeleteImage}>Xóa</button>
                             <button className="download-button">Tải về</button>
                             <button className="edit-button">Sửa</button>
                         </div>
